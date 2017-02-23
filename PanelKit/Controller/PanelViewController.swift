@@ -265,9 +265,13 @@ public protocol PanelViewControllerDelegate: class {
 			
 			delegate?.didDrag(self, toEdgeOf: .right)
 			
-		} else if self.view.frame.minX <= 0 {
-			
-			delegate?.didDrag(self, toEdgeOf: .left)
+        } else if self.view.frame.minX <= 0 {
+            
+            delegate?.didDrag(self, toEdgeOf: .left)
+            
+        } else if self.view.frame.minY <= 0 {
+            
+            delegate?.didDrag(self, toEdgeOf: .top)
 			
 		} else {
 			
@@ -295,7 +299,11 @@ public protocol PanelViewControllerDelegate: class {
 			
 			delegate?.didEndDrag(self, toEdgeOf: .left)
 			
-		} else {
+        } else if self.view.frame.minY <= 0 {
+            
+            delegate?.didEndDrag(self, toEdgeOf: .top)
+
+        } else {
 			
 			delegate?.didEndDragFree(self)
 			
@@ -323,10 +331,14 @@ public protocol PanelViewControllerDelegate: class {
 				dragInsets.left -= viewToMove.bounds.width
 			}
 			
-			if pinnedSide == .right {
-				dragInsets.right -= viewToMove.bounds.width
-			}
-			
+            if pinnedSide == .right {
+                dragInsets.right -= viewToMove.bounds.width
+            }
+            
+            if pinnedSide == .top {
+                dragInsets.top -= viewToMove.bounds.height
+            }
+            
 		}
 		
 		var newX = proposedCenter.x

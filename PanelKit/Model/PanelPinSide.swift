@@ -9,13 +9,16 @@
 import Foundation
 
 @objc public enum PanelPinSide: Int, CustomStringConvertible {
+    case top
 	case left
 	case right
 	
 	public var description: String {
 		switch self {
-		case .left:
-			return "left"
+        case .top:
+            return "top"
+        case .left:
+            return "left"
 		case .right:
 			return "right"
 		}

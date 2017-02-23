@@ -65,7 +65,7 @@ public extension PanelManager where Self: UIViewController {
 	}
 	
 	var panelManagerLogLevel: LogLevel {
-		return .none
+		return .full
 	}
 	
 	func dragInsets(for panel: PanelViewController) -> UIEdgeInsets {
@@ -99,8 +99,19 @@ extension PanelManager {
 		
 		return nil
 	}
-	
-	func totalDragInsets(for panel: PanelViewController) -> UIEdgeInsets {
+    
+    var panelPinnedTop: PanelViewController? {
+        
+        for panel in panels {
+            if panel.pinnedSide == .top {
+                return panel
+            }
+        }
+        
+        return nil
+    }
+
+    func totalDragInsets(for panel: PanelViewController) -> UIEdgeInsets {
 		
 		let insets = dragInsets(for: panel)
 		
@@ -214,14 +225,21 @@ extension PanelManager where Self: UIViewController {
 		
 		previewTargetFrame.origin.y = 0.0
 		
-		switch side {
+
+        switch side {
 		case .left:
 			previewTargetFrame.origin.x = 0.0
-		case .right:
-			previewTargetFrame.origin.x = panelContentWrapperView.bounds.width - panelView.bounds.width
+            previewTargetFrame.size.height = panelContentWrapperView.bounds.height - previewTargetFrame.origin.y
+        case .right:
+            previewTargetFrame.origin.x = panelContentWrapperView.bounds.width - panelView.bounds.width
+            previewTargetFrame.size.height = panelContentWrapperView.bounds.height - previewTargetFrame.origin.y
+        case .top:
+            previewTargetFrame.origin.x = 0.0
+            previewTargetFrame.size.height = panelView.bounds.height
+            previewTargetFrame.size.width = panelContentWrapperView.bounds.width
+
 		}
 		
-		previewTargetFrame.size.height = panelContentWrapperView.bounds.height - previewTargetFrame.origin.y
 		
 		return previewTargetFrame
 	}
@@ -232,7 +250,8 @@ extension PanelManager where Self: UIViewController {
 		
 		updatedContentViewFrame.size.width = panelContentWrapperView.bounds.width
 		
-		updatedContentViewFrame.origin.x = 0.0
+        updatedContentViewFrame.origin.x = 0.0
+        updatedContentViewFrame.origin.y = 0.0
 		
 		
 		if let leftPanelSize = panelPinnedLeft?.contentViewController?.preferredPanelContentSize {
@@ -242,11 +261,19 @@ extension PanelManager where Self: UIViewController {
 			updatedContentViewFrame.origin.x = leftPanelSize.width
 		}
 		
-		if let rightPanelSize = panelPinnedRight?.contentViewController?.preferredPanelContentSize {
-			
-			updatedContentViewFrame.size.width -= rightPanelSize.width
-			
-		}
+        if let rightPanelSize = panelPinnedRight?.contentViewController?.preferredPanelContentSize {
+            
+            updatedContentViewFrame.size.width -= rightPanelSize.width
+            
+        }
+
+        if let topPanelSize = panelPinnedTop?.contentViewController?.preferredPanelContentSize {
+            
+            updatedContentViewFrame.size.height -= topPanelSize.height
+            
+            print(updatedContentViewFrame)
+            
+        }
 		
 		return updatedContentViewFrame
 	}
@@ -561,6 +588,7 @@ public extension PanelManager where Self: UIViewController {
 		
 		
 		self.moveAllPanelsToValidPositions()
+        print(frame)
 		self.updateFrame(for: panel, to: frame)
 		
 		updateContentViewFrame(to: updatedContentViewFrame())
